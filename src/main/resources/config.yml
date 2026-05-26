@@ -1,0 +1,121 @@
+# PlaytimePlus
+# Used for update checks.
+# Do not change unless you know what you are doing.
+config-version: 4
+
+tracking:
+  # How often online session totals are persisted to players.yml.
+  save-interval-seconds: 300
+
+  # How often AFK thresholds are checked. Lower values are more responsive.
+  check-interval-seconds: 10
+
+  # Number of entries shown per /playtime top page.
+  leaderboard-page-size: 10
+
+afk:
+  enabled: true
+
+  # Players idle this long are automatically marked AFK unless they have the bypass permission.
+  auto-threshold-seconds: 300
+  auto-bypass-permission: "playtimeplus.afk.bypass"
+
+  # Set to 0 to disable the warning. This should be lower than auto-threshold-seconds.
+  warning-seconds: 240
+
+  # Any accepted activity clears AFK state, including manual /afk.
+  clear-on-activity: true
+
+  # Broadcast AFK and return messages to players with playtimeplus.notify.
+  broadcast: true
+
+  # AFK players can be ignored by the vanilla sleep percentage calculation.
+  ignore-sleep: true
+
+  movement:
+    # Minimum block distance that counts as movement activity.
+    distance-threshold: 0.08
+
+    # Counting camera-only movement can let simple anti-AFK scripts look active.
+    count-look: false
+    look-threshold-degrees: 18.0
+
+  kick:
+    enabled: false
+    after-seconds: 1800
+    bypass-permission: "playtimeplus.kick.bypass"
+
+placeholders:
+  # Registers %playtimeplus_*% placeholders when PlaceholderAPI is installed.
+  enabled: true
+
+rewards:
+  enabled: true
+
+  # Logs each reward claim to console.
+  announce-console: true
+
+  # Safety cap for catch-up claims when a player crosses multiple intervals between checks.
+  # Individual rules can override this.
+  max-claims-per-check: 3
+
+  # Rewards are checked from tracked playtime, not from placeholder lookups.
+  # Supported types:
+  # - interval: repeats every configured duration.
+  # - milestone: claims once after reaching the configured duration.
+  #
+  # Supported metrics: active, total, afk.
+  # Placeholders in commands/messages:
+  # {player}, {uuid}, {reward}, {reward_name}, {type}, {metric}, {claim}, {threshold},
+  # {active}, {total}, {afk}, {session}, and *_seconds variants.
+  rules:
+    active-30m-money:
+      enabled: false
+      type: "interval"
+      metric: "active"
+      every: "30m"
+      permission: ""
+      require-online: true
+      require-not-afk: true
+      max-claims-per-check: 2
+      commands:
+        - "eco give {player} 100"
+      message: "&7Earned &#57F287$100 &7for &#2b98fd{threshold}&7 active playtime."
+
+    active-1h-key:
+      enabled: false
+      type: "milestone"
+      metric: "active"
+      at: "1h"
+      permission: ""
+      require-online: true
+      require-not-afk: true
+      commands:
+        - "crate key give {player} vote 1"
+      message: "&7Reached &#2b98fd{threshold}&7 active playtime. &#57F287Reward received."
+
+messages:
+  prefix: "&#2b98fdPlaytimePlus &8› &7"
+  no-permission: "&#ED4245No permission."
+  players-only: "&#ED4245Only players can use that."
+  player-not-found: "&#ED4245No saved playtime for that player."
+  invalid-duration: "&#ED4245Use a duration like &f30m&#ED4245, &f2h&#ED4245, or &f1d12h&#ED4245."
+  invalid-metric: "&#ED4245Metric must be &factive&#ED4245, &ftotal&#ED4245, or &fafk&#ED4245."
+  usage-playtime: "&7Usage: &#2b98fd/playtime [player]&7, &#2b98fd/playtime top [active|total|afk] [page]"
+  usage-admin: "&7Usage: &#2b98fd/playtimeplus <status|reload|save|rewards|reset|set|add>"
+  playtime-self: "&7Total: &#2b98fd{total}&7. Active: &#2b98fd{active}&7. AFK: &f{afk}&7. Session: &f{session}&7."
+  playtime-other: "&f{player} &8› &7Total &#2b98fd{total}&7. Active &#2b98fd{active}&7. AFK &f{afk}&7. Last seen &f{last_seen}&7."
+  top-header: "&7Top &#2b98fd{metric} &7playtime &8(page {page}/{pages})"
+  top-line: "&8#{rank} &f{player} &8› &#2b98fd{time}"
+  afk-on: "&7You are now AFK{reason}."
+  afk-off: "&7You are no longer AFK."
+  afk-broadcast: "&f{player} &7is now AFK{reason}."
+  afk-return-broadcast: "&f{player} &7is no longer AFK after &f{duration}&7."
+  afk-warning: "&#f5c542You will be marked AFK in &f{time}&#f5c542."
+  auto-kick: "AFK for {duration}."
+  reloaded: "&#57F287Playtime reloaded."
+  saved: "&7Playtime data saved."
+  status: "&7Tracking &f{online}&7 online players and &f{records}&7 saved records. AFK: &f{afk}&7. Rewards: &f{rewards}&7."
+  reset: "&7Reset playtime for &f{player}&7."
+  set: "&7Set &#2b98fd{metric} &7playtime for &f{player}&7 to &#2b98fd{time}&7."
+  add: "&7Added &#2b98fd{time} &7to &f{player}&7's &#2b98fd{metric} &7playtime."

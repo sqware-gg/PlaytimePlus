@@ -1,0 +1,58 @@
+name: PlaytimePlus
+version: 0.1.0
+main: dev.playtimeplus.PlaytimePlusPlugin
+api-version: '26.1.2'
+author: SQWARE / Conflict
+website: https://sqware.gg
+description: Playtime tracking, AFK detection, leaderboards, and PlaceholderAPI support for Paper servers.
+softdepend:
+  - PlaceholderAPI
+commands:
+  playtime:
+    description: View playtime stats and leaderboards.
+    usage: /playtime
+    aliases:
+      - pt
+      - ptime
+  afk:
+    description: Toggle your AFK status.
+    usage: /afk [reason]
+  playtimeplus:
+    description: Manage PlaytimePlus.
+    usage: /playtimeplus
+    aliases:
+      - ptp
+      - playtimeadmin
+permissions:
+  playtimeplus.playtime:
+    description: Allows players to view their own playtime.
+    default: true
+  playtimeplus.playtime.others:
+    description: Allows viewing another player's playtime.
+    default: true
+  playtimeplus.top:
+    description: Allows viewing playtime leaderboards.
+    default: true
+  playtimeplus.afk:
+    description: Allows players to use /afk.
+    default: true
+  playtimeplus.notify:
+    description: Receives AFK broadcast messages.
+    default: true
+  playtimeplus.afk.bypass:
+    description: Exempts players from automatic AFK marking.
+    default: op
+  playtimeplus.kick.bypass:
+    description: Exempts players from AFK auto-kicks.
+    default: op
+  playtimeplus.admin:
+    description: Allows administrative PlaytimePlus commands.
+    default: op
+    children:
+      playtimeplus.playtime: true
+      playtimeplus.playtime.others: true
+      playtimeplus.top: true
+      playtimeplus.afk: true
+      playtimeplus.notify: true
+      playtimeplus.afk.bypass: true
+      playtimeplus.kick.bypass: true
