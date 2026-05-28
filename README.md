@@ -1,6 +1,6 @@
 # PlaytimePlus
 
-**Get the plugin jar, setup help, and updates in the SQWARE Discord: [discord.sqware.gg](https://discord.sqware.gg).**
+**Join the SQWARE Discord: [discord.sqware.gg](https://discord.sqware.gg).**
 
 PlaytimePlus is a Paper playtime plugin for Minecraft servers. It tracks active time, total time, AFK time, sessions, leaderboards, rewards, `/afk`, PlaceholderAPI placeholders, and optional AFK kicking.
 
