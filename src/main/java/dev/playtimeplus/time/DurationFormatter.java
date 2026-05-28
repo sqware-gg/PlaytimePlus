@@ -14,6 +14,14 @@ public final class DurationFormatter {
     }
 
     public static String compact(long millis) {
+        return compact(millis, 3);
+    }
+
+    public static String compactShort(long millis) {
+        return compact(millis, 2);
+    }
+
+    private static String compact(long millis, int maxParts) {
         long seconds = Math.max(0L, millis / 1000L);
         if (seconds == 0L) {
             return "0s";
@@ -31,7 +39,7 @@ public final class DurationFormatter {
         add(parts, hours, "h");
         add(parts, minutes, "m");
         add(parts, seconds, "s");
-        return String.join(" ", parts.stream().limit(3).toList());
+        return String.join(" ", parts.stream().limit(Math.max(1, maxParts)).toList());
     }
 
     public static String timestamp(long epochMillis) {

@@ -148,10 +148,15 @@ Reward placeholders in commands and messages:
 {metric}
 {claim}
 {threshold}
+{threshold_short}
 {active}
 {total}
 {afk}
 {session}
+{active_short}
+{total_short}
+{afk_short}
+{session_short}
 {active_seconds}
 {total_seconds}
 {afk_seconds}
@@ -182,6 +187,10 @@ If PlaceholderAPI is installed and `placeholders.enabled` is true, these placeho
 %playtimeplus_active%
 %playtimeplus_afk%
 %playtimeplus_session%
+%playtimeplus_total_short%
+%playtimeplus_active_short%
+%playtimeplus_afk_short%
+%playtimeplus_session_short%
 %playtimeplus_total_seconds%
 %playtimeplus_active_seconds%
 %playtimeplus_afk_seconds%
@@ -196,8 +205,11 @@ If PlaceholderAPI is installed and `placeholders.enabled` is true, these placeho
 %playtimeplus_rewards_claimed%
 %playtimeplus_next_reward%
 %playtimeplus_next_reward_time%
+%playtimeplus_next_reward_time_short%
 %playtimeplus_next_reward_seconds%
 ```
+
+`*_short` time placeholders show up to two non-zero units, such as `1d 1h` or `1h 1m`.
 
 ## Data
 

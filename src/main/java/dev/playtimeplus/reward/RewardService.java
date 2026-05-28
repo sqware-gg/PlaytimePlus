@@ -159,10 +159,15 @@ public final class RewardService {
         values.put("metric", rule.metric().key());
         values.put("claim", Long.toString(claimNumber));
         values.put("threshold", DurationFormatter.compact(rule.thresholdMillis()));
+        values.put("threshold_short", DurationFormatter.compactShort(rule.thresholdMillis()));
         values.put("total", DurationFormatter.compact(view.totalMillis()));
         values.put("active", DurationFormatter.compact(view.activeMillis()));
         values.put("afk", DurationFormatter.compact(view.afkMillis()));
         values.put("session", DurationFormatter.compact(view.sessionMillis()));
+        values.put("total_short", DurationFormatter.compactShort(view.totalMillis()));
+        values.put("active_short", DurationFormatter.compactShort(view.activeMillis()));
+        values.put("afk_short", DurationFormatter.compactShort(view.afkMillis()));
+        values.put("session_short", DurationFormatter.compactShort(view.sessionMillis()));
         values.put("total_seconds", Long.toString(view.totalMillis() / 1000L));
         values.put("active_seconds", Long.toString(view.activeMillis() / 1000L));
         values.put("afk_seconds", Long.toString(view.afkMillis() / 1000L));

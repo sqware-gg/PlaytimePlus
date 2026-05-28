@@ -10,6 +10,7 @@
 - Added active, total, and AFK leaderboards.
 - Added configurable interval and milestone rewards.
 - Added reward command/message placeholders, permission gates, and AFK exclusion.
+- Added short two-unit time placeholder variants.
 - Added persisted reward claim counters in `players.yml`.
 - Added reward progress PlaceholderAPI placeholders.
 - Added persistent `players.yml` storage.

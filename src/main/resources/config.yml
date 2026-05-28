@@ -67,7 +67,7 @@ rewards:
   # Supported metrics: active, total, afk.
   # Placeholders in commands/messages:
   # {player}, {uuid}, {reward}, {reward_name}, {type}, {metric}, {claim}, {threshold},
-  # {active}, {total}, {afk}, {session}, and *_seconds variants.
+  # {active}, {total}, {afk}, {session}, *_short variants, and *_seconds variants.
   rules:
     active-30m-money:
       enabled: false

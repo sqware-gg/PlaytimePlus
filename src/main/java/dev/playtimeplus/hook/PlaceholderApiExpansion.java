@@ -54,6 +54,10 @@ public final class PlaceholderApiExpansion extends PlaceholderExpansion {
             case "active" -> format(view == null ? 0L : view.activeMillis());
             case "afk" -> format(view == null ? 0L : view.afkMillis());
             case "session" -> format(view == null ? 0L : view.sessionMillis());
+            case "total_short" -> formatShort(view == null ? 0L : view.totalMillis());
+            case "active_short" -> formatShort(view == null ? 0L : view.activeMillis());
+            case "afk_short" -> formatShort(view == null ? 0L : view.afkMillis());
+            case "session_short" -> formatShort(view == null ? 0L : view.sessionMillis());
             case "total_seconds" -> seconds(view == null ? 0L : view.totalMillis());
             case "active_seconds" -> seconds(view == null ? 0L : view.activeMillis());
             case "afk_seconds" -> seconds(view == null ? 0L : view.afkMillis());
@@ -68,6 +72,7 @@ public final class PlaceholderApiExpansion extends PlaceholderExpansion {
             case "rewards_claimed" -> rewardsClaimed(view);
             case "next_reward" -> nextReward(view);
             case "next_reward_time" -> nextRewardTime(view);
+            case "next_reward_time_short" -> nextRewardTimeShort(view);
             case "next_reward_seconds" -> nextRewardSeconds(view);
             default -> null;
         };
@@ -75,6 +80,10 @@ public final class PlaceholderApiExpansion extends PlaceholderExpansion {
 
     private String format(long millis) {
         return DurationFormatter.compact(millis);
+    }
+
+    private String formatShort(long millis) {
+        return DurationFormatter.compactShort(millis);
     }
 
     private String seconds(long millis) {
@@ -108,6 +117,15 @@ public final class PlaceholderApiExpansion extends PlaceholderExpansion {
         }
         return playtimeService.rewards().nextProgress(view)
                 .map(progress -> DurationFormatter.compact(progress.remainingMillis()))
+                .orElse("");
+    }
+
+    private String nextRewardTimeShort(PlayerTimeView view) {
+        if (view == null) {
+            return "";
+        }
+        return playtimeService.rewards().nextProgress(view)
+                .map(progress -> DurationFormatter.compactShort(progress.remainingMillis()))
                 .orElse("");
     }
 
