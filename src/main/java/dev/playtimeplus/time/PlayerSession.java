@@ -1,9 +1,17 @@
 package dev.playtimeplus.time;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 final class PlayerSession {
+    private record ActivitySample(String type, String signature, long millis) {
+    }
+
     private final UUID uuid;
+    private final Deque<ActivitySample> recentActivity = new ArrayDeque<>();
     private long joinMillis;
     private long lastTickMillis;
     private long lastActivityMillis;
@@ -37,6 +45,7 @@ final class PlayerSession {
         warned = false;
         manualAfk = false;
         afkReason = "";
+        recentActivity.clear();
     }
 
     long lastTickMillis() {
@@ -93,5 +102,30 @@ final class PlayerSession {
 
     void afkReason(String afkReason) {
         this.afkReason = afkReason == null ? "" : afkReason;
+    }
+
+    boolean repetitiveActivity(String type, String signature, long nowMillis, long windowMillis,
+                               int minEvents, int maxUniqueSignatures) {
+        if (windowMillis <= 0L || minEvents <= 1 || maxUniqueSignatures <= 0) {
+            return false;
+        }
+        String normalizedType = type == null || type.isBlank() ? "activity" : type;
+        String normalizedSignature = signature == null || signature.isBlank() ? normalizedType : signature;
+        recentActivity.addLast(new ActivitySample(normalizedType, normalizedSignature, nowMillis));
+        long oldestAllowed = nowMillis - windowMillis;
+        while (!recentActivity.isEmpty() && recentActivity.peekFirst().millis() < oldestAllowed) {
+            recentActivity.removeFirst();
+        }
+
+        int watchedEvents = 0;
+        Set<String> signatures = new HashSet<>();
+        for (ActivitySample sample : recentActivity) {
+            if (!sample.type().equals(normalizedType)) {
+                continue;
+            }
+            watchedEvents++;
+            signatures.add(sample.signature());
+        }
+        return watchedEvents >= minEvents && signatures.size() <= maxUniqueSignatures;
     }
 }

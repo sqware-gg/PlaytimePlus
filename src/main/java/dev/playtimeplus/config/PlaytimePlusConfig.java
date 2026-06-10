@@ -2,6 +2,9 @@ package dev.playtimeplus.config;
 
 import dev.playtimeplus.reward.RewardConfigLoader;
 import dev.playtimeplus.reward.RewardSettings;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -60,6 +63,46 @@ public final class PlaytimePlusConfig {
 
     public double lookThresholdDegrees() {
         return config.getDouble("afk.movement.look-threshold-degrees", 18.0D);
+    }
+
+    public boolean activityCounts(String key, boolean fallback) {
+        return config.getBoolean("afk.activity." + key, fallback);
+    }
+
+    public boolean patternDetectionEnabled() {
+        return config.getBoolean("afk.pattern-detection.enabled", true);
+    }
+
+    public long patternWindowMillis() {
+        return seconds("afk.pattern-detection.window-seconds", 90) * 1000L;
+    }
+
+    public int patternMinEvents() {
+        return Math.max(2, config.getInt("afk.pattern-detection.min-events", 14));
+    }
+
+    public int patternMaxUniqueSignatures() {
+        return Math.max(1, config.getInt("afk.pattern-detection.max-unique-signatures", 3));
+    }
+
+    public Set<String> patternWatchedTypes() {
+        Set<String> watched = new HashSet<>();
+        for (String value : config.getStringList("afk.pattern-detection.watched-types")) {
+            if (value != null && !value.isBlank()) {
+                watched.add(value.trim().toLowerCase(Locale.ROOT));
+            }
+        }
+        if (watched.isEmpty()) {
+            watched.add("movement");
+            watched.add("interact");
+            watched.add("commands");
+            watched.add("inventory-click");
+            watched.add("item-drop");
+            watched.add("hotbar-change");
+            watched.add("swap-hands");
+            watched.add("teleport");
+        }
+        return watched;
     }
 
     public boolean kickEnabled() {

@@ -1,7 +1,7 @@
 # PlaytimePlus
 # Used for update checks.
 # Do not change unless you know what you are doing.
-config-version: 4
+config-version: 6
 
 tracking:
   # How often online session totals are persisted to players.yml.
@@ -39,6 +39,42 @@ afk:
     # Counting camera-only movement can let simple anti-AFK scripts look active.
     count-look: false
     look-threshold-degrees: 18.0
+
+  activity:
+    # High-signal activity. These are usually safe to count.
+    movement: true
+    chat: true
+    block-break: true
+    block-place: true
+    combat: true
+    item-consume: true
+
+    # Medium/low-signal activity. Keep these false unless your server prefers lenient AFK checks.
+    interact: true
+    commands: false
+    inventory-click: false
+    item-drop: false
+    hotbar-change: false
+    swap-hands: false
+    teleport: false
+
+  pattern-detection:
+    # Detects repetitive activity loops such as AFK pools, click loops, command loops,
+    # hotbar macros, and tiny back-and-forth movement. Suspicious events do not refresh
+    # active playtime, so the normal AFK threshold can still catch the player.
+    enabled: true
+    window-seconds: 90
+    min-events: 14
+    max-unique-signatures: 3
+    watched-types:
+      - movement
+      - interact
+      - commands
+      - inventory-click
+      - item-drop
+      - hotbar-change
+      - swap-hands
+      - teleport
 
   kick:
     enabled: false

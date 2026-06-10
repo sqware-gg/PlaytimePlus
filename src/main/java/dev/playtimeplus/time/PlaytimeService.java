@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -78,6 +79,10 @@ public final class PlaytimeService {
     }
 
     public synchronized void recordActivity(Player player) {
+        recordActivity(player, "activity", "");
+    }
+
+    public synchronized void recordActivity(Player player, String type, String signature) {
         PlayerSession session = sessions.get(player.getUniqueId());
         if (session == null) {
             startSession(player, false);
@@ -88,6 +93,10 @@ public final class PlaytimeService {
         }
 
         long now = now();
+        if (repetitiveActivity(session, type, signature, now)) {
+            store.record(player.getUniqueId()).markSeen(now);
+            return;
+        }
         if (session.afk()) {
             if (config.clearAfkOnActivity()) {
                 leaveAfk(player, session, now, true);
@@ -98,6 +107,25 @@ public final class PlaytimeService {
         session.lastActivityMillis(now);
         session.warned(false);
         store.record(player.getUniqueId()).markSeen(now);
+    }
+
+    private boolean repetitiveActivity(PlayerSession session, String type, String signature, long now) {
+        if (!config.patternDetectionEnabled()) {
+            return false;
+        }
+        String normalizedType = type == null || type.isBlank() ? "activity" : type.toLowerCase(java.util.Locale.ROOT);
+        Set<String> watched = config.patternWatchedTypes();
+        if (!watched.contains(normalizedType)) {
+            return false;
+        }
+        return session.repetitiveActivity(
+                normalizedType,
+                signature,
+                now,
+                config.patternWindowMillis(),
+                config.patternMinEvents(),
+                config.patternMaxUniqueSignatures()
+        );
     }
 
     public synchronized void toggleManualAfk(Player player, String reason) {

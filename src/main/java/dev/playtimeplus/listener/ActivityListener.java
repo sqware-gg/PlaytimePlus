@@ -4,7 +4,10 @@ import dev.playtimeplus.time.PlaytimeService;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -45,81 +48,124 @@ public final class ActivityListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event) {
+        if (!activityCounts("movement", true)) {
+            return;
+        }
         if (movementCounts(event.getFrom(), event.getTo())) {
-            playtimeService.recordActivity(event.getPlayer());
+            playtimeService.recordActivity(event.getPlayer(), "movement", locationSignature(event.getTo()));
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onCommand(PlayerCommandPreprocessEvent event) {
+        if (!activityCounts("commands", false)) {
+            return;
+        }
         String command = event.getMessage().split(" ", 2)[0].replaceFirst("^/", "");
         if (!command.equalsIgnoreCase("afk")) {
-            playtimeService.recordActivity(event.getPlayer());
+            playtimeService.recordActivity(event.getPlayer(), "commands", command.toLowerCase(java.util.Locale.ROOT));
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onChat(AsyncChatEvent event) {
+        if (!activityCounts("chat", true)) {
+            return;
+        }
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (player.isOnline()) {
-                playtimeService.recordActivity(player);
+                playtimeService.recordActivity(player, "chat", "chat");
             }
         });
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
-        playtimeService.recordActivity(event.getPlayer());
+        if (!activityCounts("interact", true)) {
+            return;
+        }
+        playtimeService.recordActivity(event.getPlayer(), "interact", interactSignature(event.getAction(), event.getClickedBlock()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
-        playtimeService.recordActivity(event.getPlayer());
+        if (!activityCounts("block-break", true)) {
+            return;
+        }
+        playtimeService.recordActivity(event.getPlayer(), "block-break", blockSignature(event.getBlock()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlace(BlockPlaceEvent event) {
-        playtimeService.recordActivity(event.getPlayer());
+        if (!activityCounts("block-place", true)) {
+            return;
+        }
+        playtimeService.recordActivity(event.getPlayer(), "block-place", blockSignature(event.getBlock()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
+        if (!activityCounts("inventory-click", false)) {
+            return;
+        }
         if (event.getWhoClicked() instanceof Player player) {
-            playtimeService.recordActivity(player);
+            playtimeService.recordActivity(player, "inventory-click", String.valueOf(event.getSlot()));
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDrop(PlayerDropItemEvent event) {
-        playtimeService.recordActivity(event.getPlayer());
+        if (!activityCounts("item-drop", false)) {
+            return;
+        }
+        playtimeService.recordActivity(event.getPlayer(), "item-drop", event.getItemDrop().getItemStack().getType().name());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onConsume(PlayerItemConsumeEvent event) {
-        playtimeService.recordActivity(event.getPlayer());
+        if (!activityCounts("item-consume", true)) {
+            return;
+        }
+        playtimeService.recordActivity(event.getPlayer(), "item-consume", event.getItem().getType().name());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onHeldItem(PlayerItemHeldEvent event) {
-        playtimeService.recordActivity(event.getPlayer());
+        if (!activityCounts("hotbar-change", false)) {
+            return;
+        }
+        playtimeService.recordActivity(event.getPlayer(), "hotbar-change", event.getPreviousSlot() + ">" + event.getNewSlot());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onSwapHands(PlayerSwapHandItemsEvent event) {
-        playtimeService.recordActivity(event.getPlayer());
+        if (!activityCounts("swap-hands", false)) {
+            return;
+        }
+        playtimeService.recordActivity(event.getPlayer(), "swap-hands", "swap");
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onTeleport(PlayerTeleportEvent event) {
-        playtimeService.recordActivity(event.getPlayer());
+        if (!activityCounts("teleport", false)) {
+            return;
+        }
+        playtimeService.recordActivity(event.getPlayer(), "teleport", locationSignature(event.getTo()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDamage(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player player) {
-            playtimeService.recordActivity(player);
+        if (!activityCounts("combat", true)) {
+            return;
         }
+        if (event.getDamager() instanceof Player player) {
+            playtimeService.recordActivity(player, "combat", event.getEntityType().name());
+        }
+    }
+
+    private boolean activityCounts(String key, boolean fallback) {
+        return playtimeService.config().activityCounts(key, fallback);
     }
 
     private boolean movementCounts(Location from, Location to) {
@@ -145,5 +191,24 @@ public final class ActivityListener implements Listener {
     private double angleDelta(float left, float right) {
         double delta = Math.abs(left - right) % 360.0D;
         return delta > 180.0D ? 360.0D - delta : delta;
+    }
+
+    private String interactSignature(Action action, Block block) {
+        Material material = block == null ? Material.AIR : block.getType();
+        String location = block == null ? "air" : blockSignature(block);
+        return action.name() + ":" + material.name() + ":" + location;
+    }
+
+    private String blockSignature(Block block) {
+        return block.getWorld().getName() + ":" + block.getType().name() + ":"
+                + block.getX() + ":" + block.getY() + ":" + block.getZ();
+    }
+
+    private String locationSignature(Location location) {
+        if (location == null || location.getWorld() == null) {
+            return "unknown";
+        }
+        return location.getWorld().getName() + ":"
+                + location.getBlockX() + ":" + location.getBlockY() + ":" + location.getBlockZ();
     }
 }
