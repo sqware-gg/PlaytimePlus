@@ -1,7 +1,7 @@
 name: PlaytimePlus
 version: 0.1.0
 main: dev.playtimeplus.PlaytimePlusPlugin
-api-version: '26.1.2'
+api-version: '26.2'
 author: SQWARE / Conflict
 website: https://sqware.gg
 description: Playtime tracking, AFK detection, leaderboards, and PlaceholderAPI support for Paper servers.

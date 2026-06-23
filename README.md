@@ -4,7 +4,7 @@
 
 PlaytimePlus is a Paper playtime plugin for Minecraft servers. It tracks active time, total time, AFK time, sessions, leaderboards, rewards, `/afk`, PlaceholderAPI placeholders, and optional AFK kicking.
 
-Use it as a replacement for separate playtime, AFK, leaderboard, and playtime reward plugins.
+Use it when you want playtime, AFK, leaderboard, and playtime reward features in one place.
 
 ## Features
 
@@ -24,7 +24,7 @@ Use it as a replacement for separate playtime, AFK, leaderboard, and playtime re
 
 ## Requirements
 
-- Paper `26.1.2+`
+- Paper `26.2+`
 - Java `25+`
 - Optional: PlaceholderAPI
 - Maven wrapper included
@@ -141,8 +141,6 @@ Common placeholders:
 `*_short` placeholders show up to two non-zero units, such as `1d 1h` or `1h 1m`.
 
 ## Build
-
-Use JDK 25:
 
 ```powershell
 .\mvnw.cmd package
